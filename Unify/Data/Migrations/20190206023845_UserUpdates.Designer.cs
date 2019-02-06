@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Unify.Data;
 
 namespace Unify.Data.Migrations
 {
     [DbContext(typeof(UnifyContext))]
-    partial class UnifyContextModelSnapshot : ModelSnapshot
+    [Migration("20190206023845_UserUpdates")]
+    partial class UserUpdates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
