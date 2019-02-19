@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Unify.Data
 {
-    public class PartyUser
+    public class Guests
     {
         public int Id { get; set; }
 

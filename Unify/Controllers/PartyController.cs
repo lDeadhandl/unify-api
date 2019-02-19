@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Unify.Data;
+using Unify.ViewModel;
 
 namespace Unify.Controllers
 {
@@ -20,14 +21,27 @@ namespace Unify.Controllers
         }
 
         [HttpGet("{userId}")]
-        public async Task<ActionResult<List<Party>>> GetUserParties(string userId)
+        public async Task<ActionResult<PartyVM>> GetUserParty(string userId)
         {
             if (!await UserExists(userId))
                 return BadRequest($"User with id {userId} does not exist");
 
-            var parties = await _unifyContext.Party.Where(x => x.UserId == userId).ToListAsync();
+            var user = await _unifyContext.User
+                .Include(u => u.Parties)
+                .FirstAsync(u => u.Id == userId);
 
-            return Ok(parties);
+            var party = user.Parties.FirstOrDefault();
+            if (party == null)
+                return Ok(null);
+
+            // Map to the view model PartyVM
+            var partyVm = new PartyVM
+            {
+                Id = party.Id,
+                Name = party.Name
+            };
+
+            return Ok(partyVm);
         }
 
         [HttpPost("{userId}")]
@@ -41,6 +55,8 @@ namespace Unify.Controllers
                 UserId = userId,
                 Name = name,
             });
+
+            await _unifyContext.SaveChangesAsync();
 
             return Ok();
         }

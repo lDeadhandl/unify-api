@@ -3,16 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Unify.Data
+namespace Unify.ViewModel
 {
-    public class Party
+    public class PartyVM
     {
         public int Id { get; set; }
         public string Name { get; set; }
-
-        public string UserId { get; set; }
-        public User User { get; set; }
-
-        public List<Guests> PartyUsers { get; set; }
     }
 }

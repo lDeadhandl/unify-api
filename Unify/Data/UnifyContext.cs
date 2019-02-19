@@ -15,6 +15,6 @@ namespace Unify.Data
 
         public DbSet<User> User { get; set; }
         public DbSet<Party> Party { get; set; }
-        public DbSet<PartyUser> PartyUser { get; set; }
+        public DbSet<Guests> Guests { get; set; }
     }
 }

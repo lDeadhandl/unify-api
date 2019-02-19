@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Unify.Data;
 
 namespace Unify.Data.Migrations
 {
     [DbContext(typeof(UnifyContext))]
-    partial class UnifyContextModelSnapshot : ModelSnapshot
+    [Migration("20190218184443_OneToOneUserParty")]
+    partial class OneToOneUserParty
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +36,7 @@ namespace Unify.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Guests");
+                    b.ToTable("PartyUser");
                 });
 
             modelBuilder.Entity("Unify.Data.Party", b =>
@@ -49,7 +51,9 @@ namespace Unify.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Party");
                 });
@@ -62,6 +66,8 @@ namespace Unify.Data.Migrations
                     b.Property<string>("DisplayName");
 
                     b.Property<string>("Email");
+
+                    b.Property<string>("PartyId");
 
                     b.Property<string>("Product");
 
@@ -91,8 +97,8 @@ namespace Unify.Data.Migrations
             modelBuilder.Entity("Unify.Data.Party", b =>
                 {
                     b.HasOne("Unify.Data.User", "User")
-                        .WithMany("Parties")
-                        .HasForeignKey("UserId");
+                        .WithOne("Party")
+                        .HasForeignKey("Unify.Data.Party", "UserId");
                 });
 #pragma warning restore 612, 618
         }

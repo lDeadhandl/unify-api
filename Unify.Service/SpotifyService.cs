@@ -44,6 +44,9 @@ namespace Unify.Service
                 }
             };
 
+            _client = new HttpClient();
+            _userService = new SpotifyUserService();
+
             _options = spotifyOptions.Value;
         }
 
@@ -68,24 +71,6 @@ namespace Unify.Service
         public Task<SpotifyUserService> GetUserService(string accessToken)
         {
             return Task.FromResult(_userService.GetService(accessToken));
-        }
-
-        //TO DO: Need to generalize the parameter so it accepts a number that corresponds to the total
-        //number of songs the user has
-        //NOTE: *** Potenially may have to add a comparison function based off of individual data sizes so one user isn't favored over all others ***
-        public async Task GetTracks(int x)
-        {
-            //Creates list of tasks that grab (50 * i) tracks                 
-            var trackCall = Enumerable.Range(0, x).Select(i => _client.GetAsync("https://api.spotify.com/v1/me/tracks?limit=50&offset=" + (i * 50))).ToList();
-            var tracksGrab = await Task.WhenAll(trackCall);
-
-            foreach (var item in tracksGrab)
-            {
-                var tracksContent = await item.Content.ReadAsStringAsync();
-                var tracks = JsonConvert.DeserializeObject<Paging<SavedTrack>>(tracksContent);
-                var Swag = tracks.Items.Select(z => z.Track.Id).ToList();
-                Tracks.AddRange(Swag);
-            }
         }
 
         public async Task GetAudioFeatures(List<string> Ids)
