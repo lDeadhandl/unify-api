@@ -13,79 +13,43 @@ namespace Unify.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
-        public SpotifyServiceOptions Options { get; set; }
-        private readonly UnifyContext _context;
+        private UnifyContext _unifyContext;
+        private SpotifyService _spotifyService;
 
-        //Dependency injection for options from appsettings.json
-        public ValuesController(IOptions<SpotifyServiceOptions> optionsAccessor, UnifyContext context)
+        public ValuesController(
+            UnifyContext unifyContext,
+            SpotifyService spotifyService)
         {
-            Options = optionsAccessor.Value;
-            _context = context;
-
-            if (_context.User.Count() == 0)
-            {
-                // Create a new user if collection is empty,
-                // which means you can't delete all users.
-                _context.User.Add(new User { DisplayName = "Item1" });
-                _context.SaveChanges();
-            }
+            _unifyContext = unifyContext;
+            _spotifyService = spotifyService;
         }
 
         // GET api/values
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        [HttpGet("{userId}/prediction")]
+        public async Task<ActionResult<string[]>> GetPredictions(string userId, string guestId, int x, string tracks)
         {
-            return await _context.User.ToListAsync();
-        }
+            var user = await _unifyContext.User.FindAsync(userId);
+            var guest = await _unifyContext.User.FindAsync(guestId);
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
-        {
-            var User = await _context.User.FindAsync(id);
+            // Set the authorization
+            var userService = await _spotifyService.GetUserService(user.SpotifyAccessToken);// ADD: error handling for tokens
+            var userTracks = await userService.GetUserTracks(x); 
 
-            if (User == null)
-            {
-                return NotFound();
-            }
+            var guestService = await _spotifyService.GetUserService(guest.SpotifyAccessToken);
+            var guestTracks = await guestService.GetUserTracks(x);
 
-            return User;
-        }
+            userService.Comparator(userTracks, guestTracks);
 
-        // POST api/values
-        [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
-        {
-            var userExists = await _context.User.AnyAsync(u => u.Id == user.Id);
-            if (userExists)
-                return BadRequest($"User with id {user.Id} already exists.");
+            var tracksTemp = new List<string>();
+            tracksTemp.Add(tracks);
 
-            _context.User.Add(user);
-            await _context.SaveChangesAsync();
+            await userService.GetAudioFeatures(userService.TargetListIds, 0);
+            await userService.GetAudioFeatures(tracksTemp, 1);
 
-            //change so the id matches the new spot's available id
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
-        }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(string id, User user)
-        {
-            if (id != user.Id)
-            {
-                return BadRequest();
-            }
+            var answer = userService.DecisionTree();
 
-            _context.Entry(user).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            return Ok(answer);
         }
 
     }

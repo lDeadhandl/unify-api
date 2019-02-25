@@ -25,12 +25,6 @@ namespace Unify.Service
         private HttpClient _client;
         private SpotifyUserService _userService;
 
-        public List<string> Tracks { get; set; }
-        public List<string> TargetList { get; set; }
-        public List<int> TargetValues { get; set; }
-        public List<AudioFeatures> audioFeatures { get; set; }
-        public List<string> TargetListIds { get; set; }
-
         public SpotifyService(IOptions<SpotifyServiceOptions> spotifyOptions)
         {
             // Set the serializer settings to the snake case which is what the spotify responses are formatted as

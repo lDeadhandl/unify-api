@@ -42,6 +42,7 @@ namespace Unify.Controllers
             return Ok(tracks);
         }
 
+        
         [HttpPost]
         public async Task<ActionResult> Authorize(string token)
         {

@@ -30,6 +30,6 @@ namespace Unify.Service
         public float Valence { get; set; }
 
         public string Uri { get; set; }
-
     }
+
 }
