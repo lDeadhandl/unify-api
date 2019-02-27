@@ -52,20 +52,20 @@ namespace Unify.Controllers
 
         [HttpPost("{userId}")]
         public async Task<ActionResult> CreateParty(string userId, [FromQuery]string name)
-        {       
+        {
+            // Check if user exists
+            if (!await UserExists(userId))
+                return BadRequest($"User with id {userId} does not exist");
+
             var user = await _unifyContext.User
             .Include(u => u.Parties)
             .FirstAsync(u => u.Id == userId);
 
             var party = user.Parties
-                .FirstOrDefault();
+            .FirstOrDefault();
 
             var guest = await _unifyContext.Guests
             .AnyAsync(u => u.UserId == userId);
-
-            // Check if user exists
-            if (!await UserExists(userId))
-                return BadRequest($"User with id {userId} does not exist");
 
             // Check if user is in a party
             if (party != null || guest)
@@ -86,6 +86,10 @@ namespace Unify.Controllers
         [HttpPost("{userId}/add")]
         public async Task<ActionResult> AddMember(string userId, string guestId)
         {
+            // Check if users exist
+            if (!await UserExists(userId) || !await UserExists(guestId))
+                return BadRequest($"User with id {userId} does not exist");
+
             var leader = await _unifyContext.User
             .Include(u => u.Parties)
             .FirstAsync(u => u.Id == userId);
@@ -97,12 +101,8 @@ namespace Unify.Controllers
             var guest = await _unifyContext.Guests
             .AnyAsync(u => u.UserId == guestId);
 
-            // Check if users exist
-            if (!await UserExists(userId) || !await UserExists(guestId))
-                return BadRequest($"User with id {userId} does not exist");
-
             // Check if user is in a party
-            if (party != null || guest)
+            if (guest)
                 return BadRequest($"User with id {userId} already has a party");
 
             // Create guest with partyId matching leaders partyId

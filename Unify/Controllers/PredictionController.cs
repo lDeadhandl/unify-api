@@ -11,12 +11,12 @@ namespace Unify.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ValuesController : ControllerBase
+    public class PredictionController : ControllerBase
     {
         private UnifyContext _unifyContext;
         private SpotifyService _spotifyService;
 
-        public ValuesController(
+        public PredictionController(
             UnifyContext unifyContext,
             SpotifyService spotifyService)
         {
