@@ -1,167 +1,165 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading.Tasks;
-using Unify.Data;
-using Unify.ViewModel;
+﻿//using Microsoft.AspNetCore.Mvc;
+//using Microsoft.EntityFrameworkCore;
+//using System.Linq;
+//using System.Threading.Tasks;
+//using Unify.Data;
+//using Unify.ViewModel;
 
-namespace Unify.Controllers
-{
-    [ApiController]
-    [Route("api/party")]
-    public class PartyController : ControllerBase
-    {
-        private UnifyContext _unifyContext;
+//namespace Unify.Controllers
+//{
+//    [ApiController]
+//    [Route("api/party")]
+//    public class PartyController : ControllerBase
+//    {
 
-        public PartyController(UnifyContext unifyContext)
-        {
-            _unifyContext = unifyContext;
-        }
 
-        [HttpGet("{userId}")]
-        public async Task<ActionResult<PartyVM>> GetUserParty(string userId)
-        {
-            // Check if user exists
-            if (!await UserExists(userId))
-                return BadRequest($"User with id {userId} does not exist");
+//        [HttpGet("{userId}")]
+//        public async Task<ActionResult<PartyVM>> GetUserParty(string userId)
+//        {
+//            // Check if user exists
+//            if (!await UserExists(userId))
+//                return BadRequest($"User with id {userId} does not exist");
 
-            var user = await _unifyContext.User
-                .Include(u => u.Parties)
-                .FirstAsync(u => u.Id == userId);
+//            var user = await _unifyContext.User
+//                .Include(u => u.Parties)
+//                .FirstAsync(u => u.Id == userId);
 
-            var party = user.Parties
-                .FirstOrDefault();
-            if (party == null)
-                return Ok(null);
+//            var party = user.Parties
+//                .FirstOrDefault();
+//            if (party == null)
+//                return Ok(null);
 
-            var guests = await _unifyContext.Guests
-                .Include(u => u.User)
-                .Where(u => u.PartyId == party.Id)
-                .ToListAsync();
+//            var guests = await _unifyContext.Guests
+//                .Include(u => u.User)
+//                .Where(u => u.PartyId == party.Id)
+//                .ToListAsync();
 
-            // Map to the view model PartyVM
-            var partyVm = new PartyVM
-            {
-                Id = party.Id,
-                Name = party.Name,
-                Guests = guests.Select(u => u.UserId).ToList()
-            };
+//            // Map to the view model PartyVM
+//            var partyVm = new PartyVM
+//            {
+//                Id = party.Id,
+//                Name = party.Name,
+//                Guests = guests.Select(u => u.UserId).ToList()
+//            };
 
-            return Ok(partyVm);
-        }
+//            return Ok(partyVm);
+//        }
 
-        [HttpPost("{userId}")]
-        public async Task<ActionResult> CreateParty(string userId, [FromQuery]string name)
-        {
-            // Check if user exists
-            if (!await UserExists(userId))
-                return BadRequest($"User with id {userId} does not exist");
+//        [HttpPost("{userId}")]
+//        public async Task<ActionResult> CreateParty(string userId, [FromQuery]string name)
+//        {
 
-            var user = await _unifyContext.User
-            .Include(u => u.Parties)
-            .FirstAsync(u => u.Id == userId);
 
-            var party = user.Parties
-            .FirstOrDefault();
 
-            var guest = await _unifyContext.Guests
-            .AnyAsync(u => u.UserId == userId);
+//            // Check if user exists
+//            if (!await UserExists(userId))
+//                return BadRequest($"User with id {userId} does not exist");
 
-            // Check if user is in a party
-            if (party != null || guest)
-                return BadRequest($"User with id {userId} already has a party");
+//            var user = await _unifyContext.User
+//            .Include(u => u.Parties)
+//            .FirstAsync(u => u.Id == userId);
 
-            // Add new party to Db
-            await _unifyContext.Party.AddAsync(new Party()
-            {
-                UserId = userId,
-                Name = name,
-            });
+//            var party = user.Parties
+//            .FirstOrDefault();
 
-            await _unifyContext.SaveChangesAsync();
+//            var guest = await _unifyContext.Guests
+//            .AnyAsync(u => u.UserId == userId);
 
-            return Ok();
-        }
+//            // Check if user is in a party
+//            if (party != null || guest)
+//                return BadRequest($"User with id {userId} already has a party");
 
-        [HttpPost("{userId}/add")]
-        public async Task<ActionResult> AddMember(string userId, string guestId)
-        {
-            // Check if users exist
-            if (!await UserExists(userId) || !await UserExists(guestId))
-                return BadRequest($"User with id {userId} does not exist");
+//            // Add new party to Db
+//            await _unifyContext.Party.AddAsync(new Party()
+//            {
+//                UserId = userId,
+//                Name = name,
+//            });
 
-            var leader = await _unifyContext.User
-            .Include(u => u.Parties)
-            .FirstAsync(u => u.Id == userId);
+//            await _unifyContext.SaveChangesAsync();
 
-            var party = leader.Parties.FirstOrDefault();
-            if (party == null)
-                return Ok(null);
+//            return Ok();
+//        }
 
-            var guest = await _unifyContext.Guests
-            .AnyAsync(u => u.UserId == guestId);
+//        [HttpPost("{userId}/add")]
+//        public async Task<ActionResult> AddMember(string userId, string guestId)
+//        {
+//            // Check if users exist
+//            if (!await UserExists(userId) || !await UserExists(guestId))
+//                return BadRequest($"User with id {userId} does not exist");
 
-            // Check if user is in a party
-            if (guest)
-                return BadRequest($"User with id {userId} already has a party");
+//            var leader = await _unifyContext.User
+//            .Include(u => u.Parties)
+//            .FirstAsync(u => u.Id == userId);
 
-            // Create guest with partyId matching leaders partyId
-            await _unifyContext.AddAsync(new Guests
-            {
-                UserId = guestId,
-                PartyId = party.Id,
-            });
+//            var party = leader.Parties.FirstOrDefault();
+//            if (party == null)
+//                return Ok(null);
 
-            _unifyContext.SaveChanges();
+//            var guest = await _unifyContext.Guests
+//            .AnyAsync(u => u.UserId == guestId);
 
-            return Ok();
+//            // Check if user is in a party
+//            if (guest)
+//                return BadRequest($"User with id {userId} already has a party");
 
-        }
+//            // Create guest with partyId matching leaders partyId
+//            await _unifyContext.AddAsync(new Guests
+//            {
+//                UserId = guestId,
+//                PartyId = party.Id,
+//            });
 
-        [HttpDelete("{userId}")]
-        public async Task<ActionResult> RemoveGuest(string userId, string guestId)
-        {
-            // Check if users exist
-            if (!await UserExists(userId) || !await UserExists(guestId))
-                return BadRequest($"User with id {userId} does not exist");
+//            _unifyContext.SaveChanges();
 
-            // check if user with guestid is in the party
-            var guest = await _unifyContext.Guests.Where(u => u.UserId == guestId).FirstAsync();
+//            return Ok();
 
-            _unifyContext.Guests.Remove(guest);
-            await _unifyContext.SaveChangesAsync();
+//        }
 
-            return Ok();
+//        [HttpDelete("{userId}")]
+//        public async Task<ActionResult> RemoveGuest(string userId, string guestId)
+//        {
+//            // Check if users exist
+//            if (!await UserExists(userId) || !await UserExists(guestId))
+//                return BadRequest($"User with id {userId} does not exist");
 
-        }
+//            // check if user with guestid is in the party
+//            var guest = await _unifyContext.Guests.Where(u => u.UserId == guestId).FirstAsync();
 
-        [HttpDelete("{userId}/removeparty")]
-        public async Task<ActionResult> RemoveParty(string userId)
-        {
-            // Check if users exist
-            if (!await UserExists(userId))
-                return BadRequest($"User with id {userId} does not exist");
+//            _unifyContext.Guests.Remove(guest);
+//            await _unifyContext.SaveChangesAsync();
 
-            var user = await _unifyContext.User
-            .Include(u => u.Parties)
-            .FirstAsync(u => u.Id == userId);
+//            return Ok();
 
-            var party = user.Parties
-                .FirstOrDefault();
-            if (party == null)
-                return Ok(null);
+//        }
 
-            _unifyContext.Party.Remove(party);
-            await _unifyContext.SaveChangesAsync();
+//        [HttpDelete("{userId}/removeparty")]
+//        public async Task<ActionResult> RemoveParty(string userId)
+//        {
+//            // Check if users exist
+//            if (!await UserExists(userId))
+//                return BadRequest($"User with id {userId} does not exist");
 
-            return Ok();
-        }
+//            var user = await _unifyContext.User
+//            .Include(u => u.Parties)
+//            .FirstAsync(u => u.Id == userId);
 
-        // HELPERS
+//            var party = user.Parties
+//                .FirstOrDefault();
+//            if (party == null)
+//                return Ok(null);
 
-        private Task<bool> UserExists(string userId)
-        {
-            return _unifyContext.User.AnyAsync(x => x.Id == userId);
-        }
-    }
-}
+//            _unifyContext.Party.Remove(party);
+//            await _unifyContext.SaveChangesAsync();
+
+//            return Ok();
+//        }
+
+//        // HELPERS
+
+//        private Task<bool> UserExists(string userId)
+//        {
+//            return _unifyContext.User.AnyAsync(x => x.Id == userId);
+//        }
+//    }
+//}

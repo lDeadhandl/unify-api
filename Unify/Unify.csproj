@@ -21,6 +21,26 @@
 
   <ItemGroup>
     <Content Remove="Index.cshtml" />
+    <Content Remove="appsettings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Data\Migrations\20190218185228_RenamePartyUserTable.Designer.cs" />
+    <Compile Remove="Data\Migrations\20190218185228_RenamePartyUserTable.cs" />
+    <Compile Remove="Data\Migrations\20190205030202_AddParties.Designer.cs" />
+    <Compile Remove="Data\Migrations\20190205030202_AddParties.cs" />
+    <Compile Remove="Data\Migrations\20190218184443_OneToOneUserParty.cs" />
+    <Compile Remove="Data\Migrations\20190219022043_ManyParty.Designer.cs" />
+    <Compile Remove="Data\Migrations\20190219022043_ManyParty.cs" />
+    <Compile Remove="Data\Migrations\20190206023845_UserUpdates.cs" />
+    <Compile Remove="Data\Migrations\20190218184443_OneToOneUserParty.Designer.cs" />
+    <Compile Remove="Data\Migrations\20190205024142_InitialCreate.Designer.cs" />
+    <Compile Remove="Data\Migrations\20190218185017_FixPartyIdOnUser.cs" />
+    <Compile Remove="Data\Migrations\20190218185017_FixPartyIdOnUser.Designer.cs" />
+    <Compile Remove="Data\Migrations\UnifyContextModelSnapshot.cs" />
+    <Compile Remove="Data\Migrations\20190205024142_InitialCreate.cs" />
+    <Compile Remove="Data\Migrations\20190206023845_UserUpdates.Designer.cs" />
+    <Compile Remove="AppStart\DataConfig.cs" />
+    <Compile Remove="Data\UnifyContext.cs" />
   </ItemGroup>
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

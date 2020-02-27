@@ -29,8 +29,7 @@ namespace Unify
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddSwaggerDocumentation()
-                .AddApiServices(Configuration)
-                .AddDatabaseStorage(Configuration);
+                .AddApiServices(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

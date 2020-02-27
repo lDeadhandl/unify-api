@@ -19,7 +19,7 @@
     "Unify": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/values",
+      "launchUrl": "",
       "environmentVariables": {
         "GOOGLE_APPLICATION_CREDENTIALS": "/Users/stefanvladetic/Code/FirestoreTest/unify-database-c1199ea7c04d.json",
         "ASPNETCORE_ENVIRONMENT": "Development"

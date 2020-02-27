@@ -75,7 +75,7 @@ namespace Unify.Service
             {
                 var tracksJson = await item.Content.ReadAsStringAsync();
                 var tracks = JsonConvert.DeserializeObject<Paging<SavedTrack>>(tracksJson, _serializerSettings);
-                var trackList = tracks.Items.Select(z => z.Track.Id).ToList();
+                var trackList = tracks.Items.Select(z => z.Track.Name).ToList();
                 Tracks.AddRange(trackList);
             }
 
